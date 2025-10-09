@@ -1,6 +1,3 @@
-/* sketch.ino
-   Konversi dari ESP-IDF main.c ke Arduino IDE (.ino) dengan FreeRTOS task
-*/
 
 #include <Arduino.h>
 #include <Wire.h>
