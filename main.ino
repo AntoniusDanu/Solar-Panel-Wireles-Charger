@@ -71,7 +71,7 @@ void readTask(void *pvParameters) {
 void setup() {
   Serial.begin(115200);
   delay(100);
-  Serial.println("Starting INA219 dual I2C example (Arduino + FreeRTOS + LCD)");
+  Serial.println(" Starting ");
 
   I2CInput.begin(I2C_INPUT_SDA, I2C_INPUT_SCL, I2C_MASTER_FREQ_HZ);
   I2COutput.begin(I2C_OUTPUT_SDA, I2C_OUTPUT_SCL, I2C_MASTER_FREQ_HZ);
