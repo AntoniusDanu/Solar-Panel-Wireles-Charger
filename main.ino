@@ -4,13 +4,17 @@
 
 #define I2C_MASTER_FREQ_HZ 100000
 #define INA219_ADDR 0x40
-#define I2C_INPUT_SDA  16
-#define I2C_INPUT_SCL  17
-#define I2C_OUTPUT_SDA 21
-#define I2C_OUTPUT_SCL 19
+#define I2C_INPUT_SDA   16
+#define I2C_INPUT_SCL   17
+#define I2C_OUTPUT_SDA  21
+#define I2C_OUTPUT_SCL  19
+#define I2C_LCD_SDA     22
+#define I2C_LCD_SCL     23
 
-TwoWire I2CInput = TwoWire(0);
+TwoWire I2CInput  = TwoWire(0);
 TwoWire I2COutput = TwoWire(1);
+TwoWire I2CLcd    = TwoWire(2);  
+
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // variabel global (shared antara task dan loop)
@@ -33,16 +37,19 @@ float ina219_get_shunt_voltage(TwoWire &i2c) {
   int16_t val = (int16_t)reg;
   return val * 0.00001f;
 }
+
 float ina219_get_bus_voltage(TwoWire &i2c) {
   int reg = ina219_read_register(i2c, 0x02);
   if (reg < 0) return -1.0f;
   return ((reg >> 3) & 0x1FFF) * 0.004f;
 }
+
 float ina219_get_power(TwoWire &i2c) {
   int reg = ina219_read_register(i2c, 0x03);
   if (reg < 0) return -1.0f;
   return reg * 20.0f;
 }
+
 float ina219_get_current(TwoWire &i2c) {
   int reg = ina219_read_register(i2c, 0x04);
   if (reg < 0) return -1.0f;
@@ -50,7 +57,7 @@ float ina219_get_current(TwoWire &i2c) {
   return val * 0.001f * 1000.0f;
 }
 
-// task hanya update variabel global
+// Task pembacaan INA219
 void readTask(void *pvParameters) {
   for (;;) {
     vin_bus  = ina219_get_bus_voltage(I2CInput);
@@ -61,8 +68,10 @@ void readTask(void *pvParameters) {
     vout_curr = ina219_get_current(I2COutput);
     vout_pwr  = ina219_get_power(I2COutput);
 
-    Serial.printf("INPUT  : Bus=%.3f V | Current=%.3f mA | Power=%.3f mW\n", vin_bus, vin_curr, vin_pwr);
-    Serial.printf("OUTPUT : Bus=%.3f V | Current=%.3f mA | Power=%.3f mW\n", vout_bus, vout_curr, vout_pwr);
+    Serial.printf("INPUT  : Bus=%.3f V | Current=%.3f mA | Power=%.3f mW\n",
+                  vin_bus, vin_curr, vin_pwr);
+    Serial.printf("OUTPUT : Bus=%.3f V | Current=%.3f mA | Power=%.3f mW\n",
+                  vout_bus, vout_curr, vout_pwr);
 
     vTaskDelay(pdMS_TO_TICKS(2000));
   }
@@ -71,19 +80,23 @@ void readTask(void *pvParameters) {
 void setup() {
   Serial.begin(115200);
   delay(100);
-  Serial.println(" Starting ");
+  Serial.println("Starting INA219 dual I2C example + LCD on separate bus");
 
+  // Inisialisasi dua bus INA219
   I2CInput.begin(I2C_INPUT_SDA, I2C_INPUT_SCL, I2C_MASTER_FREQ_HZ);
   I2COutput.begin(I2C_OUTPUT_SDA, I2C_OUTPUT_SCL, I2C_MASTER_FREQ_HZ);
 
+  // Inisialisasi bus terpisah untuk LCD
+  I2CLcd.begin(I2C_LCD_SDA, I2C_LCD_SCL, I2C_MASTER_FREQ_HZ);
   lcd.init();
   lcd.backlight();
 
+  // Jalankan task FreeRTOS untuk pembacaan sensor
   xTaskCreatePinnedToCore(readTask, "INA219_ReadTask", 4096, NULL, 1, NULL, 1);
 }
 
 void loop() {
-  // LCD update tiap 2 detik
+  // Update tampilan LCD setiap 2 detik
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.printf("In:%.2fV %.1fmA", vin_bus, vin_curr);
