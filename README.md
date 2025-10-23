@@ -1,5 +1,7 @@
 # Solar-Panel-Wireless-Charger
 
+## Schematics 
+
 <img width="572" height="362" alt="Screenshot from 2025-10-23 11-21-15" src="https://github.com/user-attachments/assets/afc4fe44-47fe-4f26-80d9-298284a18e98" />
 
 
