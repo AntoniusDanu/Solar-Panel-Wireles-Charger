@@ -8,7 +8,8 @@
 ## Requirements
 
 - INA 219 (Input & Output)
-
+  
+  https://www.ti.com/lit/ds/symlink/ina219.pdf?ts=1760069324175&ref_url=https%253A%252F%252Fwww.google.com%252F
   <img width="542" height="444" alt="Screenshot from 2025-10-23 10-44-12" src="https://github.com/user-attachments/assets/e860733b-cf8b-4ed3-b4c6-c8e3e4c64795" />
 
   
