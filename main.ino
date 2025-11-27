@@ -106,9 +106,9 @@ void setup() {
   lcd.backlight();
 
   // Kalibrasi INA219
-  ina219_calibrate_auto(Wire, INA219_ADDR_INPUT, 1.0f, 2.0f,
+  ina219_calibrate_auto(Wire, INA219_ADDR_INPUT, 1.0f, 5.0f,
                         INA_current_LSB_input, INA_power_LSB_input);
-  ina219_calibrate_auto(Wire1, INA219_ADDR_OUTPUT, 0.1f, 2.0f,
+  ina219_calibrate_auto(Wire1, INA219_ADDR_OUTPUT, 0.1f, 5.0f,
                         INA_current_LSB_output, INA_power_LSB_output);
 
   // Jalankan task baca sensor
